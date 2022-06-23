@@ -37,6 +37,27 @@ matrix_row_t matrix_mask[MATRIX_ROWS] = {
 };
 // clang-format on
 
+//////////////////////////////////////////////////////////////////////////////
+
+extern void matrix_io_delay(void);
+
+static uint8_t peek_matrix_intersection(pin_t out_pin, pin_t in_pin) {
+    setPinInputHigh(in_pin);
+    setPinOutput(out_pin);
+    writePinLow(out_pin);
+    wait_us(1);
+    uint8_t pin_state = readPin(in_pin);
+    setPinInputHigh(out_pin);
+    matrix_io_delay();
+    return pin_state;
+}
+
+bool is_keyboard_left(void) {
+    return !peek_matrix_intersection(F7, D7);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 void keyball_on_adjust_layout(keyball_adjust_t v) {
 #ifdef RGBLIGHT_ENABLE
     // adjust RGBLIGHT's clipping and effect ranges
